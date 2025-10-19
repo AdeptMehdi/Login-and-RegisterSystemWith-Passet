@@ -4,7 +4,7 @@ const User = require("../Entities/User");
 const AuditLog = require("../Entities/AuditLog");
 const RefreshToken = require("../Entities/RefreshToken");
 const { issueToken } = require("../Services/PasetoService");
-const { encrypt, decrypt } = require("../utils/crypto"); // ابزار رمزگذاری/رمزگشایی
+const { encrypt, decrypt } = require("../utils/crypto"); 
 
 function clientInfo(req) {
   return {
@@ -22,14 +22,26 @@ async function register(req, res) {
       return res.status(400).json({ error: "email, username, password are required" });
     }
 
-    const exists = await User.findOne({ where: { email } });
+    
+    const exists = await User.findOne({ 
+      where: { email },
+      attributes: ["id"] 
+    });
     if (exists) return res.status(409).json({ error: "Email already registered" });
 
+   
     const passwordHash = await bcrypt.hash(password, 12);
+
     const user = await User.create({ email, username, passwordHash });
 
+    
     const info = clientInfo(req);
-    await AuditLog.create({ userId: user.id, action: "register", ipAddress: info.ip, userAgent: info.ua });
+    AuditLog.create({
+      userId: user.id,
+      action: "register",
+      ipAddress: info.ip,
+      userAgent: info.ua
+    }).catch(err => console.error("AuditLog error:", err));
 
     return res.status(201).json({ message: "User registered", id: user.id });
   } catch (err) {
@@ -64,7 +76,7 @@ async function login(req, res) {
     });
 
     // رمزگذاری و ذخیره در کوکی HttpOnly
-    const encrypted = encrypt(refreshToken);
+    const encrypted = await encrypt(refreshToken);
     res.cookie("refresh_token", encrypted, {
       httpOnly: true,
       secure: true,       // فقط روی HTTPS
@@ -85,10 +97,10 @@ async function login(req, res) {
 // Refresh
 async function refresh(req, res) {
   try {
-    const encrypted = req.cookies["refresh_token"];
+    const encrypted = req.cookies?.["refresh_token"];
     if (!encrypted) return res.status(401).json({ error: "No refresh token" });
 
-    const refreshToken = decrypt(encrypted);
+    const refreshToken = await decrypt(encrypted);
 
     const stored = await RefreshToken.findOne({ where: { token: refreshToken, revoked: false } });
     if (!stored || stored.expiresAt < new Date()) {
@@ -108,7 +120,7 @@ async function refresh(req, res) {
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
 
-    const encryptedNew = encrypt(newRefreshToken);
+    const encryptedNew = await encrypt(newRefreshToken);
     res.cookie("refresh_token", encryptedNew, {
       httpOnly: true,
       secure: true,
@@ -126,9 +138,9 @@ async function refresh(req, res) {
 // Logout
 async function logout(req, res) {
   try {
-    const encrypted = req.cookies["refresh_token"];
+    const encrypted = req.cookies?.["refresh_token"];
     if (encrypted) {
-      const refreshToken = decrypt(encrypted);
+      const refreshToken = await decrypt(encrypted);
       const stored = await RefreshToken.findOne({ where: { token: refreshToken, revoked: false } });
       if (stored) {
         stored.revoked = true;
