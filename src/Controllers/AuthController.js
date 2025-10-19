@@ -41,25 +41,30 @@ async function register(req, res) {
 async function login(req, res) {
   try {
     const { email, password } = req.body;
-
-    if (!email || !password) return res.status(400).json({ error: "email and password are required" });
+    console.log("Login request:", email);
 
     const user = await User.findOne({ where: { email } });
+    console.log("User found:", user);
+
     if (!user) return res.status(401).json({ error: "Invalid credentials" });
 
     const valid = await bcrypt.compare(password, user.passwordHash);
+    console.log("Password valid:", valid);
+
     if (!valid) return res.status(401).json({ error: "Invalid credentials" });
 
     const token = await issueToken(user.id);
+    console.log("Token issued:", token);
 
     const info = clientInfo(req);
     await AuditLog.create({ userId: user.id, action: "login", ipAddress: info.ip, userAgent: info.ua });
 
     res.json({ access_token: token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Internal error" });
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Internal error", details: err.message });
   }
 }
+
 
 module.exports = { register, login };
