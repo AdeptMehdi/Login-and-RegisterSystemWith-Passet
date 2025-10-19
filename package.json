@@ -1,19 +1,19 @@
 {
-  "name": "expressjs",
+  "name": "login-register-system",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "src/app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "bcrypt": "^6.0.0",
-    "express": "^5.1.0",
-    "paseto": "^3.1.4",
-    "sequelize": "^6.37.7",
-    "tedious": "^18.6.1"
+    "bcrypt": "^5.1.1",
+    "dotenv": "^17.2.3",
+    "elogin": "^0.1.4",
+    "express": "^4.19.0",
+    "morgan": "^1.10.1",
+    "paseto": "^3.0.2",
+    "sequelize": "^6.37.0",
+    "tedious": "^16.0.0"
   }
 }
