@@ -13,6 +13,7 @@ function clientInfo(req) {
   };
 }
 
+
 // Register
 async function register(req, res) {
   try {
@@ -22,19 +23,24 @@ async function register(req, res) {
       return res.status(400).json({ error: "email, username, password are required" });
     }
 
-    
     const exists = await User.findOne({ 
       where: { email },
       attributes: ["id"] 
     });
     if (exists) return res.status(409).json({ error: "Email already registered" });
 
-   
     const passwordHash = await bcrypt.hash(password, 12);
 
     const user = await User.create({ email, username, passwordHash });
 
-    
+    // 🔑 پیدا کردن نقش user و اتصال به کاربر
+    const { Role } = require("../Entities/associations");
+    const userRole = await Role.findOne({ where: { name: "user" } });
+    if (userRole) {
+      await user.addRole(userRole);
+    }
+
+    // ثبت لاگ
     const info = clientInfo(req);
     AuditLog.create({
       userId: user.id,
@@ -49,6 +55,7 @@ async function register(req, res) {
     return res.status(500).json({ error: "Internal error" });
   }
 }
+
 
 // Login
 async function login(req, res) {

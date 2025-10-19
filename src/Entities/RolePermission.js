@@ -1,16 +1,15 @@
-// src/entities/RolePermission.js
+const { DataTypes } = require("sequelize");
 const sequelize = require("../db");
-const Role = require("./Role");
-const Permission = require("./Permission");
 
-// جدول واسط بدون تعریف ستون‌ها
-const RolePermission = sequelize.define("RolePermission", {}, {
+const RolePermission = sequelize.define("RolePermission", {
+  roleId: { type: DataTypes.BIGINT, allowNull: false },
+  permissionId: { type: DataTypes.BIGINT, allowNull: false }
+}, {
   tableName: "RolePermissions",
-  timestamps: false
+  timestamps: false,
+  indexes: [
+    { unique: true, fields: ["roleId", "permissionId"] }
+  ]
 });
-
-// روابط
-Role.belongsToMany(Permission, { through: RolePermission, foreignKey: "roleId" });
-Permission.belongsToMany(Role, { through: RolePermission, foreignKey: "permissionId" });
 
 module.exports = RolePermission;

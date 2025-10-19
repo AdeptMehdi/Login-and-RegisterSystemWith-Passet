@@ -1,6 +1,6 @@
 
 const express = require("express");
-const { issueToken, verifyToken } = require("../services/pasetoService");
+const { issueToken, verifyToken } = require("../Services/PasetoService");
 const router = express.Router();
 
 router.get("/token", async (req, res) => {
