@@ -34,7 +34,7 @@ src/
 ## ⚙️ Installation
 ```bash
 # کلون کردن پروژه
-git clone <repo-url>
+git clone https://github.com/AdeptMehdi/Login-and-RegisterSystemWith-Passet.git
 cd Login-and-RegisterSystemWith-Paset
 
 # نصب پکیج‌ها
