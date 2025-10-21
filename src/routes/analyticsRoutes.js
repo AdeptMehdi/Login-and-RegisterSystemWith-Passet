@@ -1,10 +1,10 @@
-// src/routes/analytics.js
+// src/routes/analyticsRoutes.js
 import express from "express";
-import { trackEvent } from "../Controllers/AnalyticsController.js";
+import { trackEvent, getReports } from "../Controllers/AnalyticsController.js";
 
 const router = express.Router();
 
-// مسیر عمومی برای ثبت رخدادها
 router.post("/event", trackEvent);
+router.get("/report", getReports);
 
 export default router;
