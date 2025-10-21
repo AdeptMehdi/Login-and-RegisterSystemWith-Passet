@@ -1,4 +1,3 @@
-// src/db.js
 const { Sequelize } = require("sequelize");
 
 const sequelize = new Sequelize("AuthDb", "sa", "mahdi123", {
@@ -6,8 +5,15 @@ const sequelize = new Sequelize("AuthDb", "sa", "mahdi123", {
   dialectModule: require("tedious"),
   host: "DESKTOP-OUGG3OL",
   port: 1433,
-  logging: false
-});
+  logging: false,
 
+  // 🔹 تنظیمات Connection Pool
+  pool: {
+    max: 10,       // حداکثر تعداد کانکشن همزمان
+    min: 0,        // حداقل کانکشن
+    acquire: 30000, // حداکثر زمان (ms) برای گرفتن کانکشن قبل از خطا
+    idle: 10000    // حداکثر زمان (ms) بیکار بودن کانکشن قبل از آزاد شدن
+  }
+});
 
 module.exports = sequelize;
